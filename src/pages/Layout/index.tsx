@@ -14,8 +14,10 @@ import {
     ReloadOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/store';
+import { fetchLogout } from '@/store/modules/user';
+import { useNavigate } from 'react-router-dom';
 
 export default function M_Layout() {
     const [collapsed, setCollapsed] = useState(false);
@@ -23,10 +25,24 @@ export default function M_Layout() {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
+    const dispatch = useDispatch<AppDispatch>();
+    const navi = useNavigate();
+
+    const logout = async () => {
+        // 退出登录
+        try {
+            await dispatch(fetchLogout());
+            navi('/login');
+        } catch (error) {
+
+        }
+    }
+
     const items: MenuProps['items'] = [
         {
             key: '1',
             label: '退出登录',
+            onClick: logout,
         }
     ];
 

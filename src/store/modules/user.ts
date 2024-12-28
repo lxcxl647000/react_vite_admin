@@ -1,5 +1,5 @@
-import { requestLogin, requestUserInfo } from "@/apis/user";
-import { get_token, set_token } from "@/utils/token";
+import { requestLogin, requestLogout, requestUserInfo } from "@/apis/user";
+import { get_token, remove_token, set_token } from "@/utils/token";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserState } from "../type";
 
@@ -78,5 +78,29 @@ const fetchUserInfo = () => {
     }
 }
 
-export { fetchLogin, fetchUserInfo };
+// 登出//
+const fetchLogout = () => {
+    return async (dispatch: any) => {
+        // TODO: fetch logout
+        try {
+            let res = await requestLogout();
+            if (res.code === 200) {
+                dispatch(setToken(''));
+                dispatch(setName(''));
+                dispatch(setAvatar(''));
+                dispatch(setBtns([]));
+                dispatch(setRoutes([])); ''
+                remove_token();
+                return 'ok';
+            }
+            else {
+                return Promise.reject(res.message);
+            }
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+}
+
+export { fetchLogin, fetchUserInfo, fetchLogout };
 export default userReducers;
