@@ -1,0 +1,34 @@
+.layout {
+    height: 100vh;
+    width: 100vw;
+
+    &_logo {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        margin-left: 10px;
+
+        &_img {
+            width: 30px;
+            margin-right: 10px;
+        }
+
+        &_title {
+            color: white;
+            font-size: 16px;
+        }
+    }
+
+    &_header {
+        display: flex;
+        justify-content: space-between;
+
+        &_left {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+    }
+}
