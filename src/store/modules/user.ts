@@ -5,6 +5,10 @@ import { UserState } from "../type";
 
 const initialState: UserState = {
     token: get_token(),
+    avatar: '',
+    name: '',
+    btns: [],
+    routes: []
 }
 
 let store = createSlice({
@@ -13,12 +17,24 @@ let store = createSlice({
     reducers: {
         setToken(state: UserState, action: PayloadAction<string>) {
             state.token = action.payload;
+        },
+        setName(state: UserState, action: PayloadAction<string>) {
+            state.name = action.payload;
+        },
+        setAvatar(state: UserState, action: PayloadAction<string>) {
+            state.avatar = action.payload;
+        },
+        setBtns(state: UserState, action: PayloadAction<string[]>) {
+            state.btns = action.payload;
+        },
+        setRoutes(state: UserState, action: PayloadAction<string[]>) {
+            state.routes = action.payload;
         }
     }
 });
 
 const userReducers = store.reducer;
-const { setToken } = store.actions;
+const { setToken, setName, setAvatar, setBtns, setRoutes } = store.actions;
 
 //登录
 const fetchLogin = (username: string, password: string) => {
@@ -46,9 +62,18 @@ const fetchUserInfo = () => {
         // TODO: fetch user info
         try {
             let res = await requestUserInfo();
-            console.log(res);
+            if (res.code === 200) {
+                dispatch(setName(res.data.name));
+                dispatch(setAvatar(res.data.avatar));
+                dispatch(setBtns(res.data.buttons));
+                dispatch(setRoutes(res.data.routes));
+                return 'ok';
+            }
+            else {
+                return Promise.reject(res.message);
+            }
         } catch (error) {
-
+            return Promise.reject(error);
         }
     }
 }

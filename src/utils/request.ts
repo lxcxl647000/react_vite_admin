@@ -1,4 +1,5 @@
 import axios from "axios";
+import { get_token } from "./token";
 
 let request = axios.create({
     baseURL: import.meta.env.VITE_SERVER,
@@ -7,6 +8,7 @@ let request = axios.create({
 
 request.interceptors.request.use((config) => {
     // 在发送请求之前做些什么
+    config.headers.token = get_token();
     return config;
 });
 

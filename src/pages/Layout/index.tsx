@@ -14,6 +14,8 @@ import {
     ReloadOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
 
 export default function M_Layout() {
     const [collapsed, setCollapsed] = useState(false);
@@ -27,6 +29,8 @@ export default function M_Layout() {
             label: '退出登录',
         }
     ];
+
+    const { avatar, name } = useSelector((state: RootState) => state.userReducers);
 
     return (
         <Layout className='layout'>
@@ -97,10 +101,10 @@ export default function M_Layout() {
                             <Button type="default" shape="circle" icon={<ReloadOutlined />} />
                             <Button type="default" shape="circle" icon={<ExpandOutlined />} />
                             <Button type="default" shape="circle" icon={<SettingOutlined />} />
-                            <img src="" alt="avatar" />
+                            <img className=' layout_header_right_avatar' src={avatar} alt="avatar" />
                             <Dropdown menu={{ items }}>
                                 <Space>
-                                    admin
+                                    {name}
                                     <DownOutlined />
                                 </Space>
                             </Dropdown>
