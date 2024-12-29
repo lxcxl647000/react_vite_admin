@@ -20,25 +20,4 @@
             font-size: 16px;
         }
     }
-
-    &_header {
-        display: flex;
-        justify-content: space-between;
-
-        &_left {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-        }
-
-        &_right {
-            &_avatar {
-                width: 32px;
-                height: 32px;
-                border-radius: 50%;
-                display: flex;
-                justify-content: center;
-            }
-        }
-    }
 }
