@@ -31,7 +31,7 @@ export default function MenuList({collapsed}:{collapsed:boolean}) {
                     {
                         key: '3',
                         icon: <UploadOutlined />,
-                        label: 'nav 3',
+                        label: 'nav 33',
                     },
                 ]}
             />
