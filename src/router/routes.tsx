@@ -20,6 +20,10 @@ const Home = lazy(() => import("@/pages/Home"));
 const User = lazy(() => import("@/pages/Acl/User"));
 const Role = lazy(() => import("@/pages/Acl/Role"));
 const Permission = lazy(() => import("@/pages/Acl/Permission"));
+const Trademark = lazy(() => import("@/pages/Product/Trademark"));
+const Attr = lazy(() => import("@/pages/Product/Attr"));
+const Spu = lazy(() => import("@/pages/Product/Spu"));
+const Sku = lazy(() => import("@/pages/Product/Sku"));
 
 export interface RouteConfig {
     path: string,
@@ -44,6 +48,11 @@ export const constantRoutes: RouteConfig[] = [
         name: 'layout',
         isShow: true,
         children: [
+            {
+                path: '/',
+                element: <Navigate to='/home' />,
+                isShow: false,
+            },
             {
                 path: '/home',
                 element: <Suspense fallback='loading'><Home /></Suspense>,
@@ -76,10 +85,14 @@ export const asyncRoutes: RouteConfig[] = [
         label: '权限管理',
         children: [
             {
+                path: '/acl',
+                element: <Navigate to='/acl/user' />,
+                isShow: false,
+            },
+            {
                 path: '/acl/user', // 用户管理
                 element: <Suspense fallback='loading'><User /></Suspense>,
                 name: 'User',
-                // index: true,
                 isShow: true,
                 icon: <UserOutlined />,
                 label: '用户管理',
@@ -112,9 +125,14 @@ export const asyncRoutes: RouteConfig[] = [
         label: '商品管理',
         children: [
             {
+                path: '/product',
+                element: <Navigate to='/product/trademark' />,
+                isShow: false,
+            },
+            {
                 // 品牌管理//
                 path: '/product/trademark',
-                element: <AuthRoute><Layout /></AuthRoute>,
+                element: <Suspense fallback='loading'><Trademark /></Suspense>,
                 name: 'Trademark',
                 isShow: true,
                 icon: <ShoppingFilled />,
@@ -123,7 +141,7 @@ export const asyncRoutes: RouteConfig[] = [
             {
                 // 属性管理//
                 path: '/product/attr',
-                element: <AuthRoute><Layout /></AuthRoute>,
+                element: <Suspense fallback='loading'><Attr /></Suspense>,
                 name: 'Attr',
                 isShow: true,
                 icon: <ProfileOutlined />,
@@ -132,7 +150,7 @@ export const asyncRoutes: RouteConfig[] = [
             {
                 // SPU管理//
                 path: '/product/spu',
-                element: <AuthRoute><Layout /></AuthRoute>,
+                element: <Suspense fallback='loading'><Spu /></Suspense>,
                 name: 'Spu',
                 isShow: true,
                 icon: <AppstoreOutlined />,
@@ -141,7 +159,7 @@ export const asyncRoutes: RouteConfig[] = [
             {
                 // SKU管理//
                 path: '/product/sku',
-                element: <AuthRoute><Layout /></AuthRoute>,
+                element: <Suspense fallback='loading'><Sku /></Suspense>,
                 name: 'Sku',
                 isShow: true,
                 icon: <AppstoreOutlined />,

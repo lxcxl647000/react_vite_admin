@@ -1,4 +1,5 @@
 import { Layout } from "antd"
+import { Outlet } from "react-router-dom"
 
 export default function Content({ colorBgContainer, borderRadiusLG }: { colorBgContainer: string, borderRadiusLG: number }) {
 
@@ -12,7 +13,7 @@ export default function Content({ colorBgContainer, borderRadiusLG }: { colorBgC
                 borderRadius: borderRadiusLG,
             }}
         >
-            Content
+            <Outlet />
         </Layout.Content>
     )
 }
