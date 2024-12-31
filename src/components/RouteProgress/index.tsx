@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation, useNavigation } from "react-router-dom"
 import nprogress from 'nprogress';
 import 'nprogress/nprogress.css';
+import router from "@/router";
 
 export default function RouteProgress() {
     const location = useLocation();
@@ -10,6 +11,9 @@ export default function RouteProgress() {
     nprogress.configure({ showSpinner: false });
 
     useEffect(() => {
+        console.log(router.state.matches);
+        const label = ((router.state.matches[1].route) as any).label || '';
+        document.title = label ? `后台管理 - ${label}` : '后台管理';
         nprogress.start();
 
         if (navigation.state === 'idle') {
