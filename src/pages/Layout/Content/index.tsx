@@ -1,3 +1,4 @@
+import RouteProgress from "@/components/RouteProgress"
 import { Layout } from "antd"
 import { Outlet } from "react-router-dom"
 
@@ -13,6 +14,7 @@ export default function Content({ colorBgContainer, borderRadiusLG }: { colorBgC
                 borderRadius: borderRadiusLG,
             }}
         >
+            <RouteProgress />
             <Outlet />
         </Layout.Content>
     )
