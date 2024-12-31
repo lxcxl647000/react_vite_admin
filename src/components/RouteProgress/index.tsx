@@ -11,7 +11,6 @@ export default function RouteProgress() {
     nprogress.configure({ showSpinner: false });
 
     useEffect(() => {
-        console.log(router.state.matches);
         const label = ((router.state.matches[1].route) as any).label || '';
         document.title = label ? `后台管理 - ${label}` : '后台管理';
         nprogress.start();

@@ -104,7 +104,7 @@ export default function Header({ collapsed, setCollapsed, colorBgContainer }: { 
                     <Button type="default" shape="circle" icon={<ReloadOutlined />} />
                     <Button type="default" shape="circle" icon={<ExpandOutlined />} />
                     <Button type="default" shape="circle" icon={<SettingOutlined />} />
-                    <img className=' layout_header_right_avatar' src={avatar} alt="avatar" />
+                    <img className='layout_header_right_avatar' src={avatar} alt="avatar" />
                     <Dropdown menu={{ items }}>
                         <Space>
                             {name}
