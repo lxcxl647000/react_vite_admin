@@ -1,0 +1,17 @@
+.user {
+    &_search {
+        &_form {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+
+    &_content {
+        margin-top: 10px;
+
+        &_table {
+            margin: 15px 0;
+        }
+    }
+}
