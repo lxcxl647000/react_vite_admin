@@ -1,9 +1,10 @@
-import { Button, Card, Form, Input, Pagination, Space, Table, TableProps, Tooltip } from "antd";
+import { Button, Card, Drawer, Form, Input, message, Pagination, Space, Table, TableProps, Tooltip } from "antd";
 import { UserOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import './index.scss'
 import { useEffect, useState } from "react";
-import { requestUserList } from "@/apis/acl";
+import { requestAddUser, requestUserList } from "@/apis/acl";
 import { IUser } from "@/apis/acl/type";
+import useUser from "@/hooks/useUser";
 
 export default function User() {
     const columns: TableProps<IUser>['columns'] = [
@@ -84,6 +85,14 @@ export default function User() {
     const [userList, setUserList] = useState<IUser[]>([]);
     const [searchName, setSearchName] = useState('');
 
+    // 添加用户//
+    const [addUserOpen, setAddUserOpen] = useState(false);
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const { validateUsername, validatePassword } = useUser();
+    const [addUserForm] = Form.useForm();
+
     const fetchData = async (page?: number, name?: string) => {
         try {
             if (page) {
@@ -111,8 +120,47 @@ export default function User() {
         fetchData(1, '');
     }
 
-    const handleSearch = () => {
-        fetchData(curPage, searchName);
+    const handleOpenAddUser = () => {
+        setAddUserOpen(true);
+    }
+
+    const handleCloseAddUser = () => {
+        clearData();
+        setAddUserOpen(false);
+        fetchData(1, '');
+    };
+
+    const handleAddUser = async () => {
+        try {
+            await addUserForm.validateFields();
+            let user: IUser = {
+                createTime: "",
+                updateTime: "",
+                username: username,
+                password: password,
+                name: name,
+
+                phone: null,
+                roleName: ""
+            };
+            const res = await requestAddUser(user);
+            if (res.code === 200) {
+                message.success('添加成功');
+            }
+            else {
+                message.error('添加失败');
+            }
+            handleCloseAddUser();
+        } catch (error) {
+
+        }
+    };
+
+    const clearData = () => {
+        setUsername('');
+        setPassword('');
+        setName('');
+        addUserForm.resetFields();
     }
 
     return (
@@ -124,7 +172,7 @@ export default function User() {
                     </Form.Item>
                     <Form.Item style={{ marginBottom: 0 }}>
                         <Space>
-                            <Button type="primary" size="large" disabled={searchName ? false : true} onClick={handleSearch}>搜索</Button>
+                            <Button type="primary" size="large" disabled={searchName ? false : true} onClick={() => fetchData(curPage, searchName)}>搜索</Button>
                             <Button type="default" size="large" onClick={handleReset}>重置</Button>
                         </Space>
                     </Form.Item>
@@ -132,7 +180,7 @@ export default function User() {
             </Card>
             <Card className="user_content">
                 <Space>
-                    <Button type="primary" size="large">添加</Button>
+                    <Button type="primary" size="large" onClick={handleOpenAddUser}>添加</Button>
                     <Button type="primary" size="large" danger disabled>批量删除</Button>
                 </Space>
                 <Table<IUser>
@@ -158,6 +206,65 @@ export default function User() {
                     }}
                 />
             </Card>
+            <Drawer
+                title="添加用户"
+                placement={'right'}
+                width={500}
+                onClose={handleCloseAddUser}
+                open={addUserOpen}
+                extra={
+                    <Space>
+                        <Button onClick={handleCloseAddUser}>取消</Button>
+                        <Button type="primary" onClick={handleAddUser}>
+                            确定
+                        </Button>
+                    </Space>
+                }
+            >
+                <Form form={addUserForm}>
+                    <Form.Item
+                        name={"username"}
+                        label="用户名字"
+                        required
+                        rules={[
+                            {
+                                validator: validateUsername
+                            }
+                        ]}
+                        validateTrigger="onBlur"
+                    >
+                        <Input placeholder="请填写用户名字" value={username} onChange={(e) => setUsername(e.target.value)} />
+                    </Form.Item>
+                    <Form.Item
+                        name={"name"}
+                        label="用户昵称"
+                        required
+                        rules={[
+                            {
+                                required: true,
+                                message: '请填写用户昵称'
+                            }
+                        ]}
+                        validateTrigger="onBlur"
+                    >
+                        <Input placeholder="请填写用户昵称" value={name} onChange={(e) => setName(e.target.value)} />
+                    </Form.Item>
+                    <Form.Item
+                        name={"password"}
+                        label="用户密码"
+                        required
+                        rules={[
+                            {
+                                validator: validatePassword
+                            }
+                        ]}
+                        validateTrigger="onBlur"
+                    >
+                        <Input placeholder="请填写用户密码" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    </Form.Item>
+                </Form>
+
+            </Drawer>
         </div>
     )
 }

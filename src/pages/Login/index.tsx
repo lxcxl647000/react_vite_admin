@@ -6,11 +6,14 @@ import { useDispatch } from "react-redux";
 import { fetchLogin } from "@/store/modules/user";
 import { AppDispatch } from "@/store";
 import { useNavigate } from "react-router-dom";
+import useUser from "@/hooks/useUser";
 export default function Login() {
     const [username, setUsername] = useState('admin');
     const [password, setPassword] = useState('111111');
     const dispatch = useDispatch<AppDispatch>();
     const navi = useNavigate();
+
+    const { validateUsername, validatePassword } = useUser();
 
     const onFinish = async () => {
         await dispatch(fetchLogin(username, password));
@@ -31,18 +34,7 @@ export default function Login() {
                     name="username"
                     rules={[
                         {
-                            validator: (_, value) => {
-                                if (!value) {
-                                    return Promise.reject('用户名不能为空');
-                                }
-                                let val = value.trim();
-                                if (val.length < 5 || val.length > 10) {
-                                    return Promise.reject('用户名长度5到10位');
-                                }
-                                else {
-                                    return Promise.resolve();
-                                }
-                            }
+                            validator: validateUsername
                         }
                     ]}
                     validateTrigger="onBlur"
@@ -59,18 +51,7 @@ export default function Login() {
                     name="password"
                     rules={[
                         {
-                            validator: (_, value) => {
-                                if (!value) {
-                                    return Promise.reject('密码不能为空');
-                                }
-                                let val = value.trim();
-                                if (val.length < 6) {
-                                    return Promise.reject('密码不能少于6位');
-                                }
-                                else {
-                                    return Promise.resolve();
-                                }
-                            }
+                            validator: validatePassword
                         }
                     ]}
                     validateTrigger="onBlur"

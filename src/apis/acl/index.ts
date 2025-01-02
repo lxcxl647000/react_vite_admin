@@ -1,5 +1,6 @@
 import { request } from "@/utils";
-import { IGetUsersResponseData } from "./type";
+import { IGetUsersResponseData, IUser } from "./type";
+import { IResponseData } from "../type";
 
 enum API {
     // 获取用户管理列表//
@@ -22,3 +23,6 @@ enum API {
 
 /**获取用户管理列表 */
 export const requestUserList = (page: number, limit: number, username: string) => request.get<any, IGetUsersResponseData>(API.GETUSERLIST_URL + `${page}/${limit}/?username=${username}`);
+
+/**新增用户 */
+export const requestAddUser = (data: IUser) => request.post<any, IResponseData>(API.ADDUSER_URL, data);
