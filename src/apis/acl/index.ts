@@ -26,3 +26,6 @@ export const requestUserList = (page: number, limit: number, username: string) =
 
 /**新增用户 */
 export const requestAddUser = (data: IUser) => request.post<any, IResponseData>(API.ADDUSER_URL, data);
+
+/**修改用户 */
+export const requestEditUser = (data: IUser) => request.put<any, IResponseData>(API.EDITUSER_URL, data);

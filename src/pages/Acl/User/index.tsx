@@ -58,10 +58,10 @@ export default function User() {
         {
             title: '操作',
             fixed: 'right',
-            render: () => (
+            render: (value: IUser) => (
                 <Space>
                     <Button type="primary" size="small" icon={<UserOutlined />}>分配角色</Button>
-                    <Button type="primary" size="small" icon={<EditOutlined />}>编辑</Button>
+                    <Button type="primary" size="small" icon={<EditOutlined />} onClick={() => handleOpenAddUser(value)}>编辑</Button>
                     <Button type="primary" size="small" icon={<DeleteOutlined />} danger>删除</Button>
                 </Space>
             ),
@@ -87,9 +87,15 @@ export default function User() {
 
     // 添加用户//
     const [addUserOpen, setAddUserOpen] = useState(false);
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [name, setName] = useState('');
+    const [user, setUser] = useState<IUser>({
+        createTime: "",
+        updateTime: "",
+        username: '',
+        password: '',
+        name: '',
+        phone: null,
+        roleName: ""
+    });
     const { validateUsername, validatePassword } = useUser();
     const [addUserForm] = Form.useForm();
 
@@ -120,7 +126,13 @@ export default function User() {
         fetchData(1, pageSize, '');
     }
 
-    const handleOpenAddUser = () => {
+    const handleOpenAddUser = async (user?: IUser) => {
+        if (user) {
+            setUser(user);
+        }
+        // setTimeout(() => {
+        //     setAddUserOpen(true);
+        // }, 1000);
         setAddUserOpen(true);
     }
 
@@ -132,18 +144,13 @@ export default function User() {
 
     const handleAddUser = async () => {
         try {
-            await addUserForm.validateFields();
-            let user: IUser = {
-                createTime: "",
-                updateTime: "",
-                username: username,
-                password: password,
-                name: name,
-
-                phone: null,
-                roleName: ""
-            };
-            const res = await requestAddUser(user);
+            const { username, name, password } = await addUserForm.validateFields();
+            let addUser = { ...user };
+            addUser.username = username;
+            addUser.name = name;
+            addUser.password = password;
+            setUser(addUser);
+            const res = await requestAddUser(addUser);
             if (res.code === 200) {
                 message.success('添加成功');
             }
@@ -157,9 +164,15 @@ export default function User() {
     };
 
     const clearData = () => {
-        setUsername('');
-        setPassword('');
-        setName('');
+        setUser({
+            createTime: "",
+            updateTime: "",
+            username: '',
+            password: '',
+            name: '',
+            phone: null,
+            roleName: ""
+        });
         addUserForm.resetFields();
     }
 
@@ -182,7 +195,7 @@ export default function User() {
             {/* 用户表格 */}
             <Card className="user_content">
                 <Space>
-                    <Button type="primary" size="large" onClick={handleOpenAddUser}>添加</Button>
+                    <Button type="primary" size="large" onClick={() => handleOpenAddUser()}>添加</Button>
                     <Button type="primary" size="large" danger disabled>批量删除</Button>
                 </Space>
                 <Table<IUser>
@@ -211,7 +224,7 @@ export default function User() {
             </Card>
             {/* 添加新用户 */}
             <Drawer
-                title="添加用户"
+                title={user.id ? "编辑用户" : "添加用户"}
                 placement={'right'}
                 width={500}
                 onClose={handleCloseAddUser}
@@ -237,7 +250,7 @@ export default function User() {
                         ]}
                         validateTrigger="onBlur"
                     >
-                        <Input placeholder="请填写用户名字" value={username} onChange={(e) => setUsername(e.target.value)} />
+                        <Input placeholder="请填写用户名字" />
                     </Form.Item>
                     <Form.Item
                         name={"name"}
@@ -251,9 +264,10 @@ export default function User() {
                         ]}
                         validateTrigger="onBlur"
                     >
-                        <Input placeholder="请填写用户昵称" value={name} onChange={(e) => setName(e.target.value)} />
+                        <Input placeholder="请填写用户昵称" value={user.name} />
+                        {/* {user.name} */}
                     </Form.Item>
-                    <Form.Item
+                    {!user.id && <Form.Item
                         name={"password"}
                         label="用户密码"
                         required
@@ -264,8 +278,8 @@ export default function User() {
                         ]}
                         validateTrigger="onBlur"
                     >
-                        <Input placeholder="请填写用户密码" value={password} onChange={(e) => setPassword(e.target.value)} />
-                    </Form.Item>
+                        <Input placeholder="请填写用户密码" />
+                    </Form.Item>}
                 </Form>
 
             </Drawer>
