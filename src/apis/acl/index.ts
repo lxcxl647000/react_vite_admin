@@ -29,3 +29,6 @@ export const requestAddUser = (data: IUser) => request.post<any, IResponseData>(
 
 /**修改用户 */
 export const requestEditUser = (data: IUser) => request.put<any, IResponseData>(API.EDITUSER_URL, data);
+
+/**删除用户 */
+export const requestRemoveUser = (id: number) => request.delete<any, IResponseData>(API.REMOVEUSER_URL + id);

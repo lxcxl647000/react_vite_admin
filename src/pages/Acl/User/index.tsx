@@ -1,8 +1,8 @@
-import { Button, Card, Drawer, Form, Input, message, Pagination, Space, Table, TableProps, Tooltip } from "antd";
+import { Button, Card, Drawer, Form, Input, message, Pagination, Popconfirm, Space, Table, TableProps, Tooltip } from "antd";
 import { UserOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import './index.scss'
 import { useEffect, useState } from "react";
-import { requestAddUser, requestEditUser, requestUserList } from "@/apis/acl";
+import { requestAddUser, requestEditUser, requestRemoveUser, requestUserList } from "@/apis/acl";
 import { IUser } from "@/apis/acl/type";
 import useUser from "@/hooks/useUser";
 
@@ -32,14 +32,24 @@ export default function User() {
             title: '用户角色',
             dataIndex: 'roleName',
             width: 150,
+            ellipsis: {
+                showTitle: false,
+            },
+            render: (role) => (
+                <Tooltip placement="topLeft" title={role}>
+                    {role}
+                </Tooltip>
+            ),
         },
         {
             title: '创建时间',
             dataIndex: 'createTime',
-            ellipsis: true,
-            render: (address) => (
-                <Tooltip placement="topLeft" title={address}>
-                    {address}
+            ellipsis: {
+                showTitle: false,
+            },
+            render: (time) => (
+                <Tooltip placement="topLeft" title={time}>
+                    {time}
                 </Tooltip>
             ),
             width: 150,
@@ -47,10 +57,12 @@ export default function User() {
         {
             title: '更新时间',
             dataIndex: 'updateTime',
-            ellipsis: true,
-            render: (address) => (
-                <Tooltip placement="topLeft" title={address}>
-                    {address}
+            ellipsis: {
+                showTitle: false,
+            },
+            render: (time) => (
+                <Tooltip placement="topLeft" title={time}>
+                    {time}
                 </Tooltip>
             ),
             width: 150,
@@ -62,7 +74,15 @@ export default function User() {
                 <Space>
                     <Button type="primary" size="small" icon={<UserOutlined />}>分配角色</Button>
                     <Button type="primary" size="small" icon={<EditOutlined />} onClick={() => handleOpenAddUser(value)}>编辑</Button>
-                    <Button type="primary" size="small" icon={<DeleteOutlined />} danger>删除</Button>
+                    <Popconfirm
+                        title="删除用户"
+                        description="是否删除该用户"
+                        onConfirm={() => handleDeleteUser(value.id!)}
+                        okText="确认"
+                        cancelText="取消"
+                    >
+                        <Button type="primary" size="small" icon={<DeleteOutlined />} danger>删除</Button>
+                    </Popconfirm>
                 </Space>
             ),
             align: 'center',
@@ -177,6 +197,21 @@ export default function User() {
         addUserForm.resetFields();
     }
 
+    const handleDeleteUser = async (id: number) => {
+        try {
+            const res = await requestRemoveUser(id);
+            if (res.code === 200) {
+                message.success('删除成功');
+                fetchData(1, pageSize, '');
+            }
+            else {
+                message.error('删除失败');
+            }
+        } catch (error) {
+
+        }
+    }
+
     return (
         <div className="user">
             {/* 搜索 */}
@@ -233,9 +268,7 @@ export default function User() {
                 extra={
                     <Space>
                         <Button onClick={handleCloseAddUser}>取消</Button>
-                        <Button type="primary" onClick={handleAddUser}>
-                            确定
-                        </Button>
+                        <Button type="primary" onClick={handleAddUser}>确定</Button>
                     </Space>
                 }
             >
