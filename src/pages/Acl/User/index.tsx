@@ -3,8 +3,6 @@ import { UserOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import './index.scss'
 import { useEffect, useState } from "react";
 import { requestUserList } from "@/apis/acl";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 import { IUser } from "@/apis/acl/type";
 
 export default function User() {
@@ -80,19 +78,18 @@ export default function User() {
         }),
     };
 
-    const { name } = useSelector((state: RootState) => state.userReducers);
-
-    const [total, setTotal] = useState(100);
-    const [pageSize, setPageSize] = useState(10);
+    const [total, setTotal] = useState(0);
+    const [pageSize, setPageSize] = useState(5);
     const [curPage, setCurPage] = useState(1);
     const [userList, setUserList] = useState<IUser[]>([]);
+    const [searchName, setSearchName] = useState('');
 
-    const fetchData = async (page?: number) => {
+    const fetchData = async (page?: number, name?: string) => {
         try {
             if (page) {
                 setCurPage(page);
             }
-            let res = await requestUserList(page ? page : curPage, pageSize, name);
+            let res = await requestUserList(page ? page : curPage, pageSize, name || '');
             if (res.code === 200) {
                 setTotal(res.data.total);
                 setUserList(res.data.records.map((item, index) => {
@@ -109,18 +106,26 @@ export default function User() {
         fetchData();
     }, []);
 
+    const handleReset = () => {
+        setSearchName('');
+        fetchData(1, '');
+    }
+
+    const handleSearch = () => {
+        fetchData(curPage, searchName);
+    }
 
     return (
         <div className="user">
             <Card className="user_search">
                 <Form className="user_search_form">
                     <Form.Item label="用户名：" style={{ marginBottom: 0 }}>
-                        <Input placeholder="请输入用户名" />
+                        <Input placeholder="请输入用户名" value={searchName} onChange={(e) => setSearchName(e.target.value)} />
                     </Form.Item>
                     <Form.Item style={{ marginBottom: 0 }}>
                         <Space>
-                            <Button type="primary" size="large" disabled>搜索</Button>
-                            <Button type="default" size="large">重置</Button>
+                            <Button type="primary" size="large" disabled={searchName ? false : true} onClick={handleSearch}>搜索</Button>
+                            <Button type="default" size="large" onClick={handleReset}>重置</Button>
                         </Space>
                     </Form.Item>
                 </Form>

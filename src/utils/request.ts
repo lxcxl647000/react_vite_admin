@@ -2,7 +2,7 @@ import axios from "axios";
 import { get_token } from "./token";
 
 let request = axios.create({
-    baseURL: import.meta.env.VITE_SERVER,
+    baseURL: import.meta.env.VITE_APP_BASE_API,
     timeout: 10000,
 });
 
