@@ -2,7 +2,7 @@ import { Button, Card, Drawer, Form, Input, message, Pagination, Popconfirm, Spa
 import { UserOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import './index.scss'
 import { useEffect, useState } from "react";
-import { requestAddUser, requestEditUser, requestRemoveUser, requestUserList } from "@/apis/acl";
+import { requestAddUser, requestBatchRemoveUser, requestEditUser, requestRemoveUser, requestUserList } from "@/apis/acl";
 import { IUser } from "@/apis/acl/type";
 import useUser from "@/hooks/useUser";
 
@@ -77,7 +77,7 @@ export default function User() {
                     <Popconfirm
                         title="删除用户"
                         description="是否删除该用户"
-                        onConfirm={() => handleDeleteUser(value.id!)}
+                        onConfirm={() => handleRemoveUser(value.id!)}
                         okText="确认"
                         cancelText="取消"
                     >
@@ -90,13 +90,9 @@ export default function User() {
     ];
 
     const rowSelection: TableProps<IUser>['rowSelection'] = {
-        onChange: (selectedRowKeys: React.Key[], selectedRows: IUser[]) => {
-            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        onChange: (_, selectedRows: IUser[]) => {
+            setSelectedRows(selectedRows);
         },
-        getCheckboxProps: (record: IUser) => ({
-            disabled: record.name === 'Disabled User', // Column configuration not to be checked
-            name: record.name,
-        }),
     };
 
     const [total, setTotal] = useState(0);
@@ -104,6 +100,7 @@ export default function User() {
     const [curPage, setCurPage] = useState(1);
     const [userList, setUserList] = useState<IUser[]>([]);
     const [searchName, setSearchName] = useState('');
+    const [selectedRows, setSelectedRows] = useState<IUser[]>([]);
 
     // 添加用户//
     const [addUserOpen, setAddUserOpen] = useState(false);
@@ -197,7 +194,7 @@ export default function User() {
         addUserForm.resetFields();
     }
 
-    const handleDeleteUser = async (id: number) => {
+    const handleRemoveUser = async (id: number) => {
         try {
             const res = await requestRemoveUser(id);
             if (res.code === 200) {
@@ -206,6 +203,23 @@ export default function User() {
             }
             else {
                 message.error('删除失败');
+            }
+        } catch (error) {
+
+        }
+    }
+
+    const handleBatchRemoveUser = async () => {
+        if (selectedRows.length === 0) return;
+        try {
+            const ids = selectedRows.map((item) => item.id!);
+            const res = await requestBatchRemoveUser(ids);
+            if (res.code === 200) {
+                setSelectedRows([]);
+                message.success('批量删除成功');
+                fetchData(1, pageSize, '');
+            } else {
+                message.error('批量删除失败');
             }
         } catch (error) {
 
@@ -232,7 +246,15 @@ export default function User() {
             <Card className="user_content">
                 <Space>
                     <Button type="primary" size="large" onClick={() => handleOpenAddUser()}>添加</Button>
-                    <Button type="primary" size="large" danger disabled>批量删除</Button>
+                    <Popconfirm
+                        title="批量删除用户"
+                        description="是否批量删除用户"
+                        onConfirm={handleBatchRemoveUser}
+                        okText="确认"
+                        cancelText="取消"
+                    >
+                        <Button type="primary" size="large" danger disabled={selectedRows.length === 0}>批量删除</Button>
+                    </Popconfirm>
                 </Space>
                 <Table<IUser>
                     rowSelection={{ type: 'checkbox', ...rowSelection }}
@@ -316,6 +338,6 @@ export default function User() {
                 </Form>
 
             </Drawer>
-        </div>
+        </div >
     )
 }

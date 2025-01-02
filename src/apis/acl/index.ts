@@ -32,3 +32,6 @@ export const requestEditUser = (data: IUser) => request.put<any, IResponseData>(
 
 /**删除用户 */
 export const requestRemoveUser = (id: number) => request.delete<any, IResponseData>(API.REMOVEUSER_URL + id);
+
+/**批量删除用户 */
+export const requestBatchRemoveUser = (data: number[]) => request.delete<any, IResponseData>(API.BATCHREMOVEUSER_URL, { data });
