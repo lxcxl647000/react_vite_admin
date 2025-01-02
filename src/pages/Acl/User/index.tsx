@@ -1,42 +1,14 @@
 import { Button, Card, Form, Input, Pagination, Space, Table, TableProps, Tooltip } from "antd";
 import { UserOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import './index.scss'
+import { useEffect, useState } from "react";
+import { requestUserList } from "@/apis/acl";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { IUser } from "@/apis/acl/type";
 
-interface DataType {
-    key: React.Key;
-    name: string;
-    age: number;
-    address: string;
-}
 export default function User() {
-    const data: DataType[] = [
-        {
-            key: '1',
-            name: 'John Brown',
-            age: 32,
-            address: 'New York No. 1 Lake ParkNew York No. 1 Lake Park',
-        },
-        {
-            key: '2',
-            name: 'Jim Green',
-            age: 42,
-            address: 'London No. 1 Lake Park',
-        },
-        {
-            key: '3',
-            name: 'Joe Black',
-            age: 32,
-            address: 'Sydney No. 1 Lake Park',
-        },
-        {
-            key: '4',
-            name: 'Disabled',
-            age: 99,
-            address: 'Sydney No. 1 Lake Park',
-        },
-    ];
-
-    const columns: TableProps<DataType>['columns'] = [
+    const columns: TableProps<IUser>['columns'] = [
         {
             title: '#',
             dataIndex: 'key',
@@ -59,12 +31,12 @@ export default function User() {
         },
         {
             title: '用户角色',
-            dataIndex: 'role',
+            dataIndex: 'roleName',
             width: 150,
         },
         {
             title: '创建时间',
-            dataIndex: 'address',
+            dataIndex: 'createTime',
             ellipsis: true,
             render: (address) => (
                 <Tooltip placement="topLeft" title={address}>
@@ -75,7 +47,7 @@ export default function User() {
         },
         {
             title: '更新时间',
-            dataIndex: 'address',
+            dataIndex: 'updateTime',
             ellipsis: true,
             render: (address) => (
                 <Tooltip placement="topLeft" title={address}>
@@ -98,15 +70,45 @@ export default function User() {
         },
     ];
 
-    const rowSelection: TableProps<DataType>['rowSelection'] = {
-        onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
+    const rowSelection: TableProps<IUser>['rowSelection'] = {
+        onChange: (selectedRowKeys: React.Key[], selectedRows: IUser[]) => {
             console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
         },
-        getCheckboxProps: (record: DataType) => ({
+        getCheckboxProps: (record: IUser) => ({
             disabled: record.name === 'Disabled User', // Column configuration not to be checked
             name: record.name,
         }),
     };
+
+    const { name } = useSelector((state: RootState) => state.userReducers);
+
+    const [total, setTotal] = useState(100);
+    const [pageSize, setPageSize] = useState(10);
+    const [curPage, setCurPage] = useState(1);
+    const [userList, setUserList] = useState<IUser[]>([]);
+
+    const fetchData = async (page?: number) => {
+        try {
+            if (page) {
+                setCurPage(page);
+            }
+            let res = await requestUserList(page ? page : curPage, pageSize, name);
+            if (res.code === 200) {
+                setTotal(res.data.total);
+                setUserList(res.data.records.map((item, index) => {
+                    item.key = index + 1;
+                    return item;
+                }));
+            }
+        } catch (error) {
+
+        }
+    }
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
 
     return (
         <div className="user">
@@ -128,21 +130,27 @@ export default function User() {
                     <Button type="primary" size="large">添加</Button>
                     <Button type="primary" size="large" danger disabled>批量删除</Button>
                 </Space>
-                <Table<DataType>
+                <Table<IUser>
                     rowSelection={{ type: 'checkbox', ...rowSelection }}
                     columns={columns}
-                    dataSource={data}
+                    dataSource={userList}
                     bordered
                     className="user_content_table"
                     pagination={false}
                 />
                 <Pagination
-                    total={85}
+                    total={total}
                     showSizeChanger
                     showQuickJumper
                     showTotal={(total) => `共 ${total} 条`}
                     pageSizeOptions={[3, 5, 10]}
                     align="end"
+                    current={curPage}
+                    pageSize={pageSize}
+                    onChange={(page, pageSize) => {
+                        setCurPage(page);
+                        setPageSize(pageSize);
+                    }}
                 />
             </Card>
         </div>
