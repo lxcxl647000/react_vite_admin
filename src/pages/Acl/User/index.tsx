@@ -2,7 +2,7 @@ import { Button, Card, Drawer, Form, Input, message, Pagination, Space, Table, T
 import { UserOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import './index.scss'
 import { useEffect, useState } from "react";
-import { requestAddUser, requestUserList } from "@/apis/acl";
+import { requestAddUser, requestEditUser, requestUserList } from "@/apis/acl";
 import { IUser } from "@/apis/acl/type";
 import useUser from "@/hooks/useUser";
 
@@ -129,10 +129,8 @@ export default function User() {
     const handleOpenAddUser = async (user?: IUser) => {
         if (user) {
             setUser(user);
+            addUserForm.setFieldsValue({ username: user.username, name: user.name });
         }
-        // setTimeout(() => {
-        //     setAddUserOpen(true);
-        // }, 1000);
         setAddUserOpen(true);
     }
 
@@ -145,17 +143,20 @@ export default function User() {
     const handleAddUser = async () => {
         try {
             const { username, name, password } = await addUserForm.validateFields();
-            let addUser = { ...user };
-            addUser.username = username;
-            addUser.name = name;
-            addUser.password = password;
-            setUser(addUser);
-            const res = await requestAddUser(addUser);
+            const isEdit = user.id ? true : false;
+            let newUser = { ...user };
+            newUser.username = username;
+            newUser.name = name;
+            if (!isEdit) {
+                newUser.password = password;
+            }
+            setUser(newUser);
+            const res = isEdit ? await requestEditUser(newUser) : await requestAddUser(newUser);
             if (res.code === 200) {
-                message.success('添加成功');
+                message.success(isEdit ? '编辑成功' : '添加成功');
             }
             else {
-                message.error('添加失败');
+                message.error(isEdit ? '编辑失败' : '添加失败');
             }
             handleCloseAddUser();
         } catch (error) {
@@ -264,8 +265,7 @@ export default function User() {
                         ]}
                         validateTrigger="onBlur"
                     >
-                        <Input placeholder="请填写用户昵称" value={user.name} />
-                        {/* {user.name} */}
+                        <Input placeholder="请填写用户昵称" />
                     </Form.Item>
                     {!user.id && <Form.Item
                         name={"password"}
