@@ -93,12 +93,12 @@ export default function User() {
     const { validateUsername, validatePassword } = useUser();
     const [addUserForm] = Form.useForm();
 
-    const fetchData = async (page?: number, name?: string) => {
+    const fetchData = async (page?: number, size?: number, name?: string) => {
         try {
             if (page) {
                 setCurPage(page);
             }
-            let res = await requestUserList(page ? page : curPage, pageSize, name || '');
+            let res = await requestUserList(page ? page : curPage, size ? size : pageSize, name || '');
             if (res.code === 200) {
                 setTotal(res.data.total);
                 setUserList(res.data.records.map((item, index) => {
@@ -117,7 +117,7 @@ export default function User() {
 
     const handleReset = () => {
         setSearchName('');
-        fetchData(1, '');
+        fetchData(1, pageSize, '');
     }
 
     const handleOpenAddUser = () => {
@@ -127,7 +127,7 @@ export default function User() {
     const handleCloseAddUser = () => {
         clearData();
         setAddUserOpen(false);
-        fetchData(1, '');
+        fetchData(1, pageSize, '');
     };
 
     const handleAddUser = async () => {
@@ -165,6 +165,7 @@ export default function User() {
 
     return (
         <div className="user">
+            {/* 搜索 */}
             <Card className="user_search">
                 <Form className="user_search_form">
                     <Form.Item label="用户名：" style={{ marginBottom: 0 }}>
@@ -172,12 +173,13 @@ export default function User() {
                     </Form.Item>
                     <Form.Item style={{ marginBottom: 0 }}>
                         <Space>
-                            <Button type="primary" size="large" disabled={searchName ? false : true} onClick={() => fetchData(curPage, searchName)}>搜索</Button>
+                            <Button type="primary" size="large" disabled={searchName ? false : true} onClick={() => fetchData(curPage, pageSize, searchName)}>搜索</Button>
                             <Button type="default" size="large" onClick={handleReset}>重置</Button>
                         </Space>
                     </Form.Item>
                 </Form>
             </Card>
+            {/* 用户表格 */}
             <Card className="user_content">
                 <Space>
                     <Button type="primary" size="large" onClick={handleOpenAddUser}>添加</Button>
@@ -200,12 +202,14 @@ export default function User() {
                     align="end"
                     current={curPage}
                     pageSize={pageSize}
-                    onChange={(page, pageSize) => {
+                    onChange={(page, size) => {
                         setCurPage(page);
-                        setPageSize(pageSize);
+                        setPageSize(size);
+                        fetchData(page, size);
                     }}
                 />
             </Card>
+            {/* 添加新用户 */}
             <Drawer
                 title="添加用户"
                 placement={'right'}
